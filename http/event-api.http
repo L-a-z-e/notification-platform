@@ -1,0 +1,35 @@
+### 이벤트 생성
+POST http://localhost:8080/api/v1/events
+Content-Type: application/json
+Idempotency-Key: test-001
+
+{
+  "channel": "SLACK",
+  "recipient": "user-123",
+  "message": "배포 완료",
+  "sender": "jenkins"
+}
+
+### 같은 키로 중복 요청 (멱등성 테스트)
+POST http://localhost:8080/api/v1/events
+Content-Type: application/json
+Idempotency-Key: test-001
+
+{
+  "channel": "SLACK",
+  "recipient": "user-123",
+  "message": "배포 완료",
+  "sender": "jenkins"
+}
+
+### 다른 키로 새 요청
+POST http://localhost:8080/api/v1/events
+Content-Type: application/json
+Idempotency-Key: test-002
+
+{
+  "channel": "EMAIL",
+  "recipient": "user-456",
+  "message": "빌드 실패",
+  "sender": "jenkins"
+}
