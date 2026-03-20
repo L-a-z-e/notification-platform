@@ -1,0 +1,17 @@
+### user-123의 전체 알림 조회
+GET http://localhost:8080/api/v1/notifications?userId=user-123
+
+### user-123의 SLACK 알림만 조회
+GET http://localhost:8080/api/v1/notifications?userId=user-123&channel=SLACK
+
+### user-123의 실패한 알림만 조회
+GET http://localhost:8080/api/v1/notifications?userId=user-123&status=FAILED
+
+### pageSize=2로 페이지네이션 테스트 (1페이지)
+GET http://localhost:8080/api/v1/notifications?userId=user-123&pageSize=2
+
+### cursor로 다음 페이지 조회 (위 응답의 nextCursor 값을 넣으세요)
+GET http://localhost:8080/api/v1/notifications?userId=user-123&pageSize=2&cursor=4
+
+### user-456의 알림 조회
+GET http://localhost:8080/api/v1/notifications?userId=user-456

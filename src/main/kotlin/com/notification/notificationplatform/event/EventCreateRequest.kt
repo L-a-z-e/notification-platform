@@ -1,8 +1,13 @@
 package com.notification.notificationplatform.event
 
+import jakarta.validation.constraints.NotBlank
+
 data class EventCreateRequest(
-    val channel: Channel,
-    val recipient: String,
-    val message: String?,
-    val sender: String?
+    @field:NotBlank
+    val source: String,
+
+    @field:NotBlank
+    val eventType: String,
+
+    val payload: String?,
 )

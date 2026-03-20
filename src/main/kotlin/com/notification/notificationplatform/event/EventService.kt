@@ -8,16 +8,11 @@ class EventService (private val eventRepository: EventRepository){
         return eventRepository.findByIdempotencyKey(idempotencyKey)
     }
 
-    fun getEventsByRecipientAndChannel(recipient: String, channel: Channel): List<Event> {
-        return eventRepository.findByRecipientAndChannel(recipient, channel)
-    }
-
     fun createEvent(
         idempotencyKey: String,
-        sender: String?,
-        channel: Channel,
-        recipient: String,
-        message: String?
+        source: String,
+        eventType: String,
+        payload: String?
     ): Event {
         val exist = getEventByIdempotencyKey(idempotencyKey)
         if (exist != null)
@@ -25,10 +20,9 @@ class EventService (private val eventRepository: EventRepository){
 
         val event = Event(
             idempotencyKey = idempotencyKey,
-            sender = sender,
-            channel = channel,
-            recipient = recipient,
-            message = message
+            source = source,
+            eventType = eventType,
+            payload = payload
         )
 
         return eventRepository.save(event)

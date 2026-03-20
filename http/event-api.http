@@ -4,10 +4,9 @@ Content-Type: application/json
 Idempotency-Key: test-001
 
 {
-  "channel": "SLACK",
-  "recipient": "user-123",
-  "message": "배포 완료",
-  "sender": "jenkins"
+  "source": "jenkins",
+  "eventType": "BUILD_FAILED",
+  "payload": "PR #42 빌드 실패"
 }
 
 ### 같은 키로 중복 요청 (멱등성 테스트)
@@ -16,10 +15,9 @@ Content-Type: application/json
 Idempotency-Key: test-001
 
 {
-  "channel": "SLACK",
-  "recipient": "user-123",
-  "message": "배포 완료",
-  "sender": "jenkins"
+  "source": "jenkins",
+  "eventType": "BUILD_FAILED",
+  "payload": "PR #42 빌드 실패"
 }
 
 ### 다른 키로 새 요청
@@ -28,8 +26,17 @@ Content-Type: application/json
 Idempotency-Key: test-002
 
 {
-  "channel": "EMAIL",
-  "recipient": "user-456",
-  "message": "빌드 실패",
-  "sender": "jenkins"
+  "source": "monitoring",
+  "eventType": "ALERT_TRIGGERED",
+  "payload": "CPU 사용률 90% 초과"
+}
+
+### Validation 에러 테스트 (source 누락)
+POST http://localhost:8080/api/v1/events
+Content-Type: application/json
+Idempotency-Key: test-003
+
+{
+  "source": "",
+  "eventType": "BUILD_FAILED"
 }
