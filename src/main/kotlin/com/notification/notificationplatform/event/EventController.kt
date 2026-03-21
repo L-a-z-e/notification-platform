@@ -15,19 +15,20 @@ class EventController (private val eventService: EventService){
 
     @PostMapping
     fun createEvent(@RequestHeader("idempotency-key") idempotencyKey: String, @Valid @RequestBody request: EventCreateRequest): ResponseEntity<EventCreateResponse> {
-        val event = eventService.createEvent(
+        val result = eventService.createEvent(
             idempotencyKey = idempotencyKey,
             source = request.source,
             eventType = request.eventType,
             payload = request.payload
         )
 
+        val status = if (result.isDuplicate) HttpStatus.OK else HttpStatus.ACCEPTED
         val response = EventCreateResponse(
-            eventId = event.id!!,
-            status = "ACCEPTED",
-            notificationCount = 0
+            eventId = result.event.id!!,
+            status = if (result.isDuplicate) "ALREADY_PROCESSED" else "ACCEPTED",
+            notificationCount = result.notificationCount
         )
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response)
+        return ResponseEntity.status(status).body(response)
     }
 }

@@ -7,7 +7,10 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+    hikari:
+      leak-detection-threshold: 30000
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
     show-sql: true

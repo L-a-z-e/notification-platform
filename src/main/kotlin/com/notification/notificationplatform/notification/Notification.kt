@@ -32,6 +32,9 @@ class Notification(
     @Column(name = "error_message", columnDefinition = "TEXT")
     var errorMessage: String? = null,
 
+    @Column(name = "metadata", columnDefinition = "TEXT")
+    val metadata: String? = null,
+
     @Column(name = "retry_count", nullable = false)
     var retryCount: Int = 0,
 
