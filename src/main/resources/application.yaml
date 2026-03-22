@@ -11,6 +11,10 @@ spring:
     username: ${POSTGRES_USER:app}
     password: ${POSTGRES_PASSWORD:app1234}
     hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
       leak-detection-threshold: 30000
   jpa:
     open-in-view: false

@@ -15,9 +15,9 @@ class AsyncConfig {
     @Bean
     fun taskExecutor(): TaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 5
-        executor.maxPoolSize = 10
-        executor.queueCapacity = 25
+        executor.corePoolSize = 10
+        executor.maxPoolSize = 20
+        executor.queueCapacity = 5
         executor.setThreadNamePrefix("Notification-")
         executor.setRejectedExecutionHandler(java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy())
         executor.initialize()
