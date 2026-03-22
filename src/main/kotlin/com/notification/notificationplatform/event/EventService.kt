@@ -1,19 +1,18 @@
 package com.notification.notificationplatform.event
 
-import tools.jackson.databind.ObjectMapper
 import com.notification.notificationplatform.notification.Notification
 import com.notification.notificationplatform.notification.NotificationRepository
 import com.notification.notificationplatform.sender.NotificationCreatedEvent
-import com.notification.notificationplatform.subscription.SubscriptionRepository
-import com.notification.notificationplatform.subscription.SubscriptionStatus
+import com.notification.notificationplatform.subscription.SubscriptionCacheService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import tools.jackson.databind.ObjectMapper
 
 @Service
 class EventService (
     private val eventRepository: EventRepository,
-    private val subscriptionRepository: SubscriptionRepository,
+    private val subscriptionCacheService: SubscriptionCacheService,
     private val notificationRepository: NotificationRepository,
     private val eventPublisher: ApplicationEventPublisher,
     private val objectMapper: ObjectMapper
@@ -42,7 +41,7 @@ class EventService (
 
         eventRepository.save(event)
 
-        val subscriptions = subscriptionRepository.findByEventTypeAndStatus(eventType, SubscriptionStatus.ACTIVE)
+        val subscriptions = subscriptionCacheService.findActiveSubscriptions(eventType)
         val notifications = subscriptions.map { subscription ->
             Notification(
                 eventId = event.id!!,

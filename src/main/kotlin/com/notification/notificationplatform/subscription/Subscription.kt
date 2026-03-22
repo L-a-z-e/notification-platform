@@ -7,7 +7,8 @@ import java.time.LocalDateTime
 @Entity
 @Table(
     name = "subscriptions",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "event_type", "channel"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "event_type", "channel"])],
+    indexes = [Index(name = "idx_subscription_event_type_status", columnList = "event_type, status")]
 )
 class Subscription(
     @Id

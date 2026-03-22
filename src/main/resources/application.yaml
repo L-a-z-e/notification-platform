@@ -1,23 +1,31 @@
+server:
+  port: 8090
+
 spring:
   application:
     name: notification-platform
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://localhost:5433/notification
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:app}
+    password: ${POSTGRES_PASSWORD:app1234}
     hikari:
       leak-detection-threshold: 30000
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     defer-datasource-initialization: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      password: ${REDIS_PASSWORD:redis1234}
   sql:
     init:
       mode: always
-  h2:
-    console:
-      enabled: true
