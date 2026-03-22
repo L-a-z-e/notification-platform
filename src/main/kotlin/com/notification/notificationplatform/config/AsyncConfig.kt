@@ -17,11 +17,9 @@ class AsyncConfig {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 5
         executor.maxPoolSize = 10
-        executor.setQueueCapacity(25)
+        executor.queueCapacity = 25
         executor.setThreadNamePrefix("Notification-")
-        executor.setRejectedExecutionHandler { _, _ ->
-            logger.error("알림 발송 작업 거부됨 — 스레드 풀 포화")
-        }
+        executor.setRejectedExecutionHandler(java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy())
         executor.initialize()
         return executor
     }
