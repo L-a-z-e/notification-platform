@@ -13,9 +13,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
+import com.notification.notificationplatform.config.TestContainersConfig
 import java.time.Duration
 
 @SpringBootTest
+@ActiveProfiles("test")
+@Import(TestContainersConfig::class)
 class NotificationFlowIntegrationTest {
 
     @Autowired lateinit var eventService: EventService
@@ -48,7 +53,7 @@ class NotificationFlowIntegrationTest {
         )
 
         // then
-        assertThat(result.notificationCount).isEqualTo(1)
+        assertThat(result.isDuplicate).isFalse()
 
         await.atMost(Duration.ofSeconds(5)).untilAsserted {
             val notifications = notificationRepository.findAll()
@@ -72,7 +77,7 @@ class NotificationFlowIntegrationTest {
         val second = eventService.createEvent("dup-001", "jenkins", "BUILD_FAILED", "중복 요청")
 
         // then
-        assertThat(second.notificationCount).isEqualTo(0)
+        assertThat(second.isDuplicate).isTrue()
 
         await.atMost(Duration.ofSeconds(5)).untilAsserted {
             val notifications = notificationRepository.findAll()
@@ -121,7 +126,10 @@ class NotificationFlowIntegrationTest {
         )
 
         // then
-        assertThat(result.notificationCount).isEqualTo(0)
-        assertThat(notificationRepository.findAll()).isEmpty()
+        assertThat(result.isDuplicate).isFalse()
+
+        await.atMost(Duration.ofSeconds(3)).untilAsserted {
+            assertThat(notificationRepository.findAll()).isEmpty()
+        }
     }
 }

@@ -5,10 +5,14 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "notifications")
+@Table(
+    name = "notifications",
+    indexes = [Index(name = "idx_notification_user_id", columnList = "user_id, notification_id")]
+)
 class Notification(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notification_seq")
+    @SequenceGenerator(name = "notification_seq", sequenceName = "notification_seq", allocationSize = 50)
     @Column(name = "notification_id")
     val id: Long? = null,
 
@@ -45,5 +49,9 @@ class Notification(
     var sentAt: LocalDateTime? = null,
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @Version
+    @Column(name = "version")
+    var version: Long = 0
 )

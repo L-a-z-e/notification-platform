@@ -6,15 +6,16 @@ import com.notification.notificationplatform.event.Channel
 import org.springframework.stereotype.Service
 
 @Service
-class SubscriptionService(private val subscriptionRepository: SubscriptionRepository) {
+class SubscriptionService(
+    private val subscriptionRepository: SubscriptionRepository,
+    private val subscriptionCacheService: SubscriptionCacheService
+) {
 
     fun createSubscription(request: SubscriptionCreateRequest): Subscription {
-        // 중복 체크: userId + eventType + channel 조합
         subscriptionRepository.findByUserIdAndEventTypeAndChannel(
             request.userId, request.eventType, request.channel
         )?.let { throw DuplicateResourceException("이미 존재하는 구독입니다") }
 
-        // WEBHOOK 채널이면 webhookUrl 필수
         if (request.channel == Channel.WEBHOOK && request.webhookUrl.isNullOrBlank()) {
             throw IllegalArgumentException("WEBHOOK 채널은 webhookUrl이 필수입니다")
         }
@@ -25,7 +26,9 @@ class SubscriptionService(private val subscriptionRepository: SubscriptionReposi
             channel = request.channel,
             webhookUrl = request.webhookUrl
         )
-        return subscriptionRepository.save(subscription)
+        val saved = subscriptionRepository.save(subscription)
+        subscriptionCacheService.refreshCache(request.eventType)
+        return saved
     }
 
     fun getSubscriptions(userId: String): List<Subscription> {
@@ -38,6 +41,8 @@ class SubscriptionService(private val subscriptionRepository: SubscriptionReposi
 
         subscription.status = request.status
         subscription.updatedAt = java.time.LocalDateTime.now()
-        return subscriptionRepository.save(subscription)
+        val saved = subscriptionRepository.save(subscription)
+        subscriptionCacheService.refreshCache(eventType)
+        return saved
     }
 }
