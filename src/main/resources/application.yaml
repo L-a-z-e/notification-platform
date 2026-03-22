@@ -6,10 +6,6 @@ spring:
     name: notification-platform
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/notification?reWriteBatchedInserts=true
-    driver-class-name: org.postgresql.Driver
-    username: ${POSTGRES_USER:app}
-    password: ${POSTGRES_PASSWORD:app1234}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
@@ -18,33 +14,11 @@ spring:
       leak-detection-threshold: 30000
   jpa:
     open-in-view: false
-    hibernate:
-      ddl-auto: create
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.batch_size: 50
         order_inserts: true
         order_updates: true
-    show-sql: true
-    defer-datasource-initialization: true
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6380}
-      password: ${REDIS_PASSWORD:redis1234}
-  sql:
-    init:
-      mode: always
-
-spring.cloud.aws:
-  region:
-    static: ${AWS_REGION:ap-northeast-2}
-  credentials:
-    access-key: ${AWS_ACCESS_KEY:test}
-    secret-key: ${AWS_SECRET_KEY:test}
-  sqs:
-    endpoint: ${SQS_ENDPOINT:http://localhost:4566}
 
 notification:
   sqs:

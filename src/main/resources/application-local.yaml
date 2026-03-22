@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/notification?reWriteBatchedInserts=true
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:app}
+    password: ${POSTGRES_PASSWORD:app1234}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    defer-datasource-initialization: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      password: ${REDIS_PASSWORD:redis1234}
+  sql:
+    init:
+      mode: always
+
+spring.cloud.aws:
+  region:
+    static: ap-northeast-2
+  credentials:
+    access-key: test
+    secret-key: test
+  sqs:
+    endpoint: http://localhost:4566
