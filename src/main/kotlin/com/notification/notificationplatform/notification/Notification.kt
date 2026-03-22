@@ -49,5 +49,9 @@ class Notification(
     var sentAt: LocalDateTime? = null,
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @Version
+    @Column(name = "version")
+    var version: Long = 0
 )
