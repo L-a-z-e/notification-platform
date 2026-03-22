@@ -32,3 +32,7 @@ spring:
   sql:
     init:
       mode: always
+
+rate-limit:
+  window-seconds: 60
+  max-requests: 100
