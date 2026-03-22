@@ -10,9 +10,8 @@ import io.github.resilience4j.core.IntervalFunction
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig
 import org.slf4j.LoggerFactory
-import org.springframework.context.event.EventListener
+import io.awspring.cloud.sqs.annotation.SqsListener
 import org.springframework.orm.ObjectOptimisticLockingFailureException
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper
 
@@ -38,8 +37,7 @@ class NotificationEventListener(
         .retryExceptions(ObjectOptimisticLockingFailureException::class.java)
         .build()
 
-    @Async
-    @EventListener
+    @SqsListener("\${notification.sqs.queue-name}")
     fun handleEventAccepted(event: EventAcceptedEvent) {
         val subscriptions = subscriptionCacheService.findActiveSubscriptions(event.eventType)
 

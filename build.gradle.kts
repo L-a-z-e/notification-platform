@@ -21,6 +21,8 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:4.0.0"))
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation("org.springframework.boot:spring-boot-h2console")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -39,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation("com.redis:testcontainers-redis")
+    testImplementation("io.awspring.cloud:spring-cloud-aws-testcontainers")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

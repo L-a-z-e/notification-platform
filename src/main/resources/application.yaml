@@ -37,6 +37,19 @@ spring:
     init:
       mode: always
 
+spring.cloud.aws:
+  region:
+    static: ${AWS_REGION:ap-northeast-2}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY:test}
+    secret-key: ${AWS_SECRET_KEY:test}
+  sqs:
+    endpoint: ${SQS_ENDPOINT:http://localhost:4566}
+
+notification:
+  sqs:
+    queue-name: notification-events
+
 management:
   endpoints:
     web:

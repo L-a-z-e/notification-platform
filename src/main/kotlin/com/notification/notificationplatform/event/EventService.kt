@@ -1,6 +1,7 @@
 package com.notification.notificationplatform.event
 
-import org.springframework.context.ApplicationEventPublisher
+import io.awspring.cloud.sqs.operations.SqsTemplate
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
@@ -9,7 +10,8 @@ import java.time.Duration
 class EventService(
     private val eventRepository: EventRepository,
     private val idempotencyKeyRepository: IdempotencyKeyRepository,
-    private val eventPublisher: ApplicationEventPublisher
+    private val sqsTemplate: SqsTemplate,
+    @Value("\${notification.sqs.queue-name}") private val queueName: String
 ) {
 
     @Transactional
@@ -32,13 +34,11 @@ class EventService(
 
         eventRepository.save(event)
 
-        eventPublisher.publishEvent(
-            EventAcceptedEvent(
-                eventId = event.id!!,
-                eventType = event.eventType,
-                payload = event.payload
-            )
-        )
+        sqsTemplate.send(queueName, EventAcceptedEvent(
+            eventId = event.id!!,
+            eventType = event.eventType,
+            payload = event.payload
+        ))
 
         return EventCreateResult(event)
     }

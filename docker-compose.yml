@@ -11,9 +11,14 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SPRING_CLOUD_AWS_SQS_ENDPOINT: http://localstack:4566
+      SPRING_CLOUD_AWS_REGION_STATIC: ap-northeast-2
+      SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: test
+      SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: test
     depends_on:
       - postgres
       - redis
+      - localstack
     deploy:
       resources:
         limits:
@@ -47,6 +52,15 @@ services:
         limits:
           cpus: "2.0"
           memory: 512m
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: notification-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs
+      DEFAULT_REGION: ap-northeast-2
 
   prometheus:
     image: prom/prometheus:latest
