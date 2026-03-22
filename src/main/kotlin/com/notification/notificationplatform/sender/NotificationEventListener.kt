@@ -30,7 +30,7 @@ class NotificationEventListener(
 
     private val slackCircuitBreaker = CircuitBreaker.of("slack", circuitBreakerConfig)
     private val webhookCircuitBreaker = CircuitBreaker.of("webhook", circuitBreakerConfig)
-    private val CHUNK_SIZE = 1000
+    private val CHUNK_SIZE = 100
 
     private val statusUpdateRetryConfig = RetryConfig.custom<Unit>()
         .maxAttempts(3)

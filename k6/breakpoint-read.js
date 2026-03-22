@@ -18,7 +18,7 @@ export const options = {
 const BASE_URL = 'http://localhost:8090';
 
 export default function () {
-    const userId = `user-${String(Math.floor(Math.random() * 50000) + 1).padStart(6, '0')}`;
+    const userId = `user-${String(Math.floor(Math.random() * 1500) + 1).padStart(4, '0')}`;
 
     const res = http.get(
         `${BASE_URL}/api/v1/notifications?userId=${userId}&pageSize=20`
