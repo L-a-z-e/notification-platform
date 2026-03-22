@@ -32,6 +32,7 @@ export default function () {
         headers: {
             'Content-Type': 'application/json',
             'idempotency-key': idempotencyKey,
+            'X-Client-Id': `write-client-${__VU}`,
         },
     };
 

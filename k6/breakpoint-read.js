@@ -21,7 +21,8 @@ export default function () {
     const userId = `user-${String(Math.floor(Math.random() * 1500) + 1).padStart(4, '0')}`;
 
     const res = http.get(
-        `${BASE_URL}/api/v1/notifications?userId=${userId}&pageSize=20`
+        `${BASE_URL}/api/v1/notifications?userId=${userId}&pageSize=20`,
+        { headers: { 'X-Client-Id': `read-client-${__VU}` } }
     );
 
     check(res, {
