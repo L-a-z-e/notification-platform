@@ -3,15 +3,14 @@ package com.notification.notificationplatform.event
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 
 @Service
 class EventService(
     private val eventRepository: EventRepository,
+    private val idempotencyKeyRepository: IdempotencyKeyRepository,
     private val eventPublisher: ApplicationEventPublisher
 ) {
-    fun getEventByIdempotencyKey(idempotencyKey: String): Event? {
-        return eventRepository.findByIdempotencyKey(idempotencyKey)
-    }
 
     @Transactional
     fun createEvent(
@@ -20,9 +19,9 @@ class EventService(
         eventType: String,
         payload: String?
     ): EventCreateResult {
-        val exist = getEventByIdempotencyKey(idempotencyKey)
-        if (exist != null)
-            return EventCreateResult(exist, isDuplicate = true)
+        val isNew = idempotencyKeyRepository.saveIfAbsent(idempotencyKey, Duration.ofHours(24))
+        if (!isNew)
+            return EventCreateResult(isDuplicate = true)
 
         val event = Event(
             idempotencyKey = idempotencyKey,

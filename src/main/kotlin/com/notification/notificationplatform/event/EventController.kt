@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/events")
-class EventController (private val eventService: EventService){
+class EventController(private val eventService: EventService) {
 
     @PostMapping
-    fun createEvent(@RequestHeader("idempotency-key") idempotencyKey: String, @Valid @RequestBody request: EventCreateRequest): ResponseEntity<EventCreateResponse> {
+    fun createEvent(
+        @RequestHeader("idempotency-key") idempotencyKey: String,
+        @Valid @RequestBody request: EventCreateRequest
+    ): ResponseEntity<EventCreateResponse> {
         val result = eventService.createEvent(
             idempotencyKey = idempotencyKey,
             source = request.source,
@@ -22,12 +25,17 @@ class EventController (private val eventService: EventService){
             payload = request.payload
         )
 
-        val status = if (result.isDuplicate) HttpStatus.OK else HttpStatus.ACCEPTED
-        val response = EventCreateResponse(
-            eventId = result.event.id!!,
-            status = if (result.isDuplicate) "ALREADY_PROCESSED" else "ACCEPTED"
-        )
+        if (result.isDuplicate) {
+            return ResponseEntity.ok(
+                EventCreateResponse(status = "ALREADY_PROCESSED")
+            )
+        }
 
-        return ResponseEntity.status(status).body(response)
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+            EventCreateResponse(
+                eventId = result.event!!.id,
+                status = "ACCEPTED"
+            )
+        )
     }
 }
