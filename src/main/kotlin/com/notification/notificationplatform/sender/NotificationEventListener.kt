@@ -3,7 +3,6 @@ package com.notification.notificationplatform.sender
 import com.notification.notificationplatform.event.Channel
 import com.notification.notificationplatform.event.EventAcceptedEvent
 import com.notification.notificationplatform.notification.Notification
-import com.notification.notificationplatform.notification.NotificationRepository
 import com.notification.notificationplatform.subscription.SubscriptionCacheService
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
@@ -20,7 +19,7 @@ import tools.jackson.databind.ObjectMapper
 @Component
 class NotificationEventListener(
     private val subscriptionCacheService: SubscriptionCacheService,
-    private val notificationRepository: NotificationRepository,
+    private val notificationChunkService: NotificationChunkService,
     private val senderRouter: NotificationSenderRouter,
     private val processingService: NotificationProcessingService,
     private val objectMapper: ObjectMapper,
@@ -44,21 +43,25 @@ class NotificationEventListener(
     fun handleEventAccepted(event: EventAcceptedEvent) {
         val subscriptions = subscriptionCacheService.findActiveSubscriptions(event.eventType)
 
-        subscriptions.chunked(CHUNK_SIZE).forEach { chunk ->
-            val notifications = chunk.map { subscription ->
-                Notification(
-                    eventId = event.eventId,
-                    userId = subscription.userId,
-                    channel = subscription.channel,
-                    message = event.payload ?: event.eventType,
-                    metadata = if (subscription.channel == Channel.WEBHOOK)
-                        objectMapper.writeValueAsString(mapOf("webhookUrl" to subscription.webhookUrl))
-                    else null
-                )
-            }
+        subscriptions.chunked(CHUNK_SIZE).forEachIndexed { index, chunk ->
+            try {
+                val notifications = chunk.map { subscription ->
+                    Notification(
+                        eventId = event.eventId,
+                        userId = subscription.userId,
+                        channel = subscription.channel,
+                        message = event.payload ?: event.eventType,
+                        metadata = if (subscription.channel == Channel.WEBHOOK)
+                            objectMapper.writeValueAsString(mapOf("webhookUrl" to subscription.webhookUrl))
+                        else null
+                    )
+                }
 
-            val saved = notificationRepository.saveAll(notifications)
-            saved.forEach { sendWithRetry(it) }
+                val saved = notificationChunkService.saveChunk(notifications)
+                saved.forEach { sendWithRetry(it) }
+            } catch (e: Exception) {
+                logger.error("청크 {} 처리 실패 — eventId={}, reason={}", index + 1, event.eventId, e.message)
+            }
         }
     }
 
