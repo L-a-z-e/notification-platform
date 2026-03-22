@@ -25,8 +25,7 @@ class EventController (private val eventService: EventService){
         val status = if (result.isDuplicate) HttpStatus.OK else HttpStatus.ACCEPTED
         val response = EventCreateResponse(
             eventId = result.event.id!!,
-            status = if (result.isDuplicate) "ALREADY_PROCESSED" else "ACCEPTED",
-            notificationCount = result.notificationCount
+            status = if (result.isDuplicate) "ALREADY_PROCESSED" else "ACCEPTED"
         )
 
         return ResponseEntity.status(status).body(response)

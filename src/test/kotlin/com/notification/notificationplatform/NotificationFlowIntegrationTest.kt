@@ -53,7 +53,7 @@ class NotificationFlowIntegrationTest {
         )
 
         // then
-        assertThat(result.notificationCount).isEqualTo(1)
+        assertThat(result.isDuplicate).isFalse()
 
         await.atMost(Duration.ofSeconds(5)).untilAsserted {
             val notifications = notificationRepository.findAll()
@@ -77,7 +77,7 @@ class NotificationFlowIntegrationTest {
         val second = eventService.createEvent("dup-001", "jenkins", "BUILD_FAILED", "중복 요청")
 
         // then
-        assertThat(second.notificationCount).isEqualTo(0)
+        assertThat(second.isDuplicate).isTrue()
 
         await.atMost(Duration.ofSeconds(5)).untilAsserted {
             val notifications = notificationRepository.findAll()
@@ -126,7 +126,10 @@ class NotificationFlowIntegrationTest {
         )
 
         // then
-        assertThat(result.notificationCount).isEqualTo(0)
-        assertThat(notificationRepository.findAll()).isEmpty()
+        assertThat(result.isDuplicate).isFalse()
+
+        await.atMost(Duration.ofSeconds(3)).untilAsserted {
+            assertThat(notificationRepository.findAll()).isEmpty()
+        }
     }
 }
