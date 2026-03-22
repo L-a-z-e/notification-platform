@@ -33,6 +33,15 @@ spring:
     init:
       mode: always
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    tags:
+      application: notification-platform
+
 rate-limit:
   window-seconds: 60
   max-requests: 100
