@@ -31,6 +31,7 @@ class NotificationEventListener(
 
     private val slackCircuitBreaker = CircuitBreaker.of("slack", circuitBreakerConfig)
     private val webhookCircuitBreaker = CircuitBreaker.of("webhook", circuitBreakerConfig)
+    private val CHUNK_SIZE = 1000
 
     private val statusUpdateRetryConfig = RetryConfig.custom<Unit>()
         .maxAttempts(3)
@@ -43,22 +44,21 @@ class NotificationEventListener(
     fun handleEventAccepted(event: EventAcceptedEvent) {
         val subscriptions = subscriptionCacheService.findActiveSubscriptions(event.eventType)
 
-        val notifications = subscriptions.map { subscription ->
-            Notification(
-                eventId = event.eventId,
-                userId = subscription.userId,
-                channel = subscription.channel,
-                message = event.payload ?: event.eventType,
-                metadata = if (subscription.channel == Channel.WEBHOOK)
-                    objectMapper.writeValueAsString(mapOf("webhookUrl" to subscription.webhookUrl))
-                else null
-            )
-        }
+        subscriptions.chunked(CHUNK_SIZE).forEach { chunk ->
+            val notifications = chunk.map { subscription ->
+                Notification(
+                    eventId = event.eventId,
+                    userId = subscription.userId,
+                    channel = subscription.channel,
+                    message = event.payload ?: event.eventType,
+                    metadata = if (subscription.channel == Channel.WEBHOOK)
+                        objectMapper.writeValueAsString(mapOf("webhookUrl" to subscription.webhookUrl))
+                    else null
+                )
+            }
 
-        val savedNotifications = notificationRepository.saveAll(notifications)
-
-        savedNotifications.forEach { notification ->
-            sendWithRetry(notification)
+            val saved = notificationRepository.saveAll(notifications)
+            saved.forEach { sendWithRetry(it) }
         }
     }
 
