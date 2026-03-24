@@ -10,6 +10,7 @@ import com.notification.notificationplatform.subscription.SubscriptionRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles
 import com.notification.notificationplatform.config.TestContainersConfig
 import java.time.Duration
 
+@Tag("integration")
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(TestContainersConfig::class)

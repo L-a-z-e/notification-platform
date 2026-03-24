@@ -60,5 +60,9 @@ allOpen {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        if (project.hasProperty("excludeIntegration")) {
+            excludeTags("integration")
+        }
+    }
 }

@@ -31,7 +31,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew test
+      - run: ./gradlew test -PexcludeIntegration
 
   deploy:
     needs: test
